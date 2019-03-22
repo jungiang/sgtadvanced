@@ -11,34 +11,6 @@ server.use(express.static(__dirname + '/html'));
 server.use(express.urlencoded({extended: false}));//have express pull body data that is urlencoded and place it into an object called "body"
 //when using axios use: server.use(express.json())
 
-// var insults = [
-//     'your father smelt of elderberries',
-//     'you program on an altaire',
-//     'I bet you still var',
-//     'one line functions are for chumps'
-// ]
-
-//1st param: takes url to listen for
-//2nd param: the callback function to call once that path has been received
-// server.get('/', (request, response)=>{
-    //receives two things
-    //an object representing all the data coming from the client to the server
-    //an object represeting all of the data going from the server to the client
-//     response.send('hello, world');
-// });
-
-//server.get(path, anonymous callback function{work})
-
-// server.get('/time',(request, response)=>{
-//     var now = new Date();
-//     response.send(now.toLocaleDateString());
-// })
-
-// server.get('/insult',(request, response)=>{
-//     var random = Math.floor(Math.random()*3+1);
-//     response.send(insults[random]);
-// })
-
 //make an endpoint to handle retrieving the grades of all students
 server.get('/api/grades', (req, res)=>{
     //establish the connection to the database, and call the callback function when connection is made
@@ -91,8 +63,33 @@ server.post('/api/grades', (req, res)=>{
                 })
             }else{
                 res.send({
-                    success: true,
+                    success: false,
                     error //ES6 structuring error: error
+                })
+            }
+        })
+    })
+})
+
+server.delete('/api/grades', (req, res)=>{
+    if(req.query.student_id === undefined){
+        res.send({
+            success: false,
+            error: 'must provide a student id for delete'
+        });
+        return;
+    }
+    db.connect(()=>{
+        const query = "DELETE FROM `grades` WHERE `id`="+req.query.student_id+"";
+        db.query(query, (error, result)=>{
+            if(!error){
+                res.send({
+                    success: true,
+                })
+            }else{
+                res.send({
+                    success: false,
+                    error
                 })
             }
         })
@@ -103,3 +100,34 @@ server.listen(3001, ()=>{
     console.log('server is running on port 3001');
     // console.log('carrier has arrived');
 });
+
+
+// {
+//     var insults = [
+//     'your father smelt of elderberries',
+//     'you program on an altaire',
+//     'I bet you still var',
+//     'one line functions are for chumps'
+// ]
+
+// 1st param: takes url to listen for
+// 2nd param: the callback function to call once that path has been received
+// server.get('/', (request, response)=>{
+//     receives two things
+//     an object representing all the data coming from the client to the server
+//     an object represeting all of the data going from the server to the client
+//     response.send('hello, world');
+// });
+
+// server.get(path, anonymous callback function{work})
+
+// server.get('/time',(request, response)=>{
+//     var now = new Date();
+//     response.send(now.toLocaleDateString());
+// })
+
+// server.get('/insult',(request, response)=>{
+//     var random = Math.floor(Math.random()*3+1);
+//     response.send(insults[random]);
+// })
+// }

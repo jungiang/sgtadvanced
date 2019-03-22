@@ -43,7 +43,7 @@ class SGT_template{
 		var serverData = null;
 		var ajaxObject = {
 			dataType: 'json',
-			url: 'api/grades',
+			url: '/api/grades',
 			method: 'get',
 			data: {
 				api_key: '2y1dCaSTzd',
@@ -74,7 +74,7 @@ class SGT_template{
 	addDataToServer(newName, newCourse, newGrade){
 		var ajaxObject = {
 			dataType: 'json',
-			url: 'http://s-apis.learningfuze.com/sgt/create',
+			url: '/api/grades',
 			method: 'POST',
 			data: {
 				api_key: '2y1dCaSTzd',
@@ -100,12 +100,8 @@ class SGT_template{
 	deleteDataFromServer(id){
 		var ajaxObject = {
 			dataType: 'json',
-			url: 'http://s-apis.learningfuze.com/sgt/delete',
-			method: 'POST',
-			data: {
-				api_key: '2y1dCaSTzd',
-				student_id: id,
-			},
+			url: 'api/grades?student_id='+id,
+			method: 'delete',
 			success: function(result){
 				if(result.success){
 					SGT.getDataFromServer();
