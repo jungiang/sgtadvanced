@@ -9,6 +9,7 @@ const server = express();
 
 server.use(express.static(__dirname + '/html'));
 server.use(express.urlencoded({extended: false}));//have express pull body data that is urlencoded and place it into an object called "body"
+//when using axios use: server.use(express.json())
 
 // var insults = [
 //     'your father smelt of elderberries',
@@ -68,10 +69,37 @@ server.get('/api/grades', (req, res)=>{
 })
 
 server.post('/api/grades', (req, res)=>{
-
+    //check the body object and see if any data was not sent
+    if(req.body.name === undefined || req.body.course === undefined || req.body.grade === undefined){
+        res.send({
+            success: false,
+            error: 'invalid name, course, or grade'
+        })
+        return;
+    }
+    //connect to the database
+    db.connect(()=>{
+        const name = req.body.name.split(' ');
+        const course = req.body.course;
+        const grade = req.body.grade;
+        const query = 'INSERT INTO `grades` SET `surname`="'+name.slice(1).join(" ")+'", `givenname`="'+name[0]+'", `course`="'+course+'", `grade`='+grade+', `added`=NOW()';
+        db.query(query, (error, results)=>{
+            if(!error){
+                res.send({
+                    success: true,
+                    new_id: results.insertId
+                })
+            }else{
+                res.send({
+                    success: true,
+                    error //ES6 structuring error: error
+                })
+            }
+        })
+    })
 })
 
 server.listen(3001, ()=>{
     console.log('server is running on port 3001');
-    console.log('carrier has arrived');
+    // console.log('carrier has arrived');
 });
