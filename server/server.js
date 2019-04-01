@@ -1,15 +1,17 @@
 const express = require('express'); //load the express library into the file
 const mysql = require('mysql'); //load the mysql library
 const mysqlcredentials = require('./mysqlcreds.js'); //load the credentials from a local file for my sql
+const cors = require('cors');
 
 //using the credentials that we loaded, establish a preliminary connection to the database
 const db = mysql.createConnection(mysqlcredentials);
 
 const server = express();
 
+server.use(cors());
 server.use(express.static(__dirname + '/html'));
 server.use(express.urlencoded({extended: false}));//have express pull body data that is urlencoded and place it into an object called "body"
-//when using axios use: server.use(express.json())
+server.use(express.json());
 
 //make an endpoint to handle retrieving the grades of all students
 server.get('/api/grades', (req, res)=>{
@@ -71,8 +73,8 @@ server.post('/api/grades', (req, res)=>{
     })
 })
 
-server.delete('/api/grades', (req, res)=>{
-    if(req.query.student_id === undefined){
+server.delete('/api/grades/:student_id', (req, res)=>{
+    if(req.params.student_id === undefined){
         res.send({
             success: false,
             error: 'must provide a student id for delete'
@@ -80,7 +82,7 @@ server.delete('/api/grades', (req, res)=>{
         return;
     }
     db.connect(()=>{
-        const query = "DELETE FROM `grades` WHERE `id`="+req.query.student_id+"";
+        const query = "DELETE FROM `grades` WHERE `id`="+req.params.student_id+"";
         db.query(query, (error, result)=>{
             if(!error){
                 res.send({
